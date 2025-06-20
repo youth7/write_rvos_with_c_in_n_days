@@ -1,23 +1,26 @@
+gcc_flag = -nostdlib -fno-builtin -g -Wall -march=rv32g -mabi=ilp32
+os_elf = os.elf
 
-compile: loop.s
+compile: start.s kernel.c
 	@echo "start to compile..."
-	@riscv64-unknown-elf-gcc -nostdlib -fno-builtin -march=rv32g -mabi=ilp32 -g -Wall -Ttext=0x80000000 loop.s  -o start.elf 
-	@riscv64-unknown-elf-objcopy -O binary start.elf start.bin	
+	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o start.o start.s
+	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o kernel.o kernel.c 
 	@echo "compile done"
 
+link: compile
+	@echo "start to link..."
+	@riscv64-unknown-elf-gcc ${gcc_flag} -Ttext=0x80000000 -o ${os_elf} start.o kernel.o
+	@echo "link done..."	
 
-debug: compile
+
+debug: link
 	@echo "start to debug..."
-	@qemu-system-riscv32 -nographic -smp 1 -machine virt -bios none -kernel start.elf -s -S & 
-	@riscv64-unknown-elf-gdb -q -ex 'target remote localhost:1234' -ex 'b _start'  -ex 'display/z $$a0'   start.elf
+	@qemu-system-riscv32 -nographic -smp 1 -machine virt -bios none -kernel ${os_elf} -s -S & 
+	@riscv64-unknown-elf-gdb -q -ex 'target remote localhost:1234' -ex 'b _start' -ex 'b start_kernel' ${os_elf}
 	@echo "debug done"
 
-run: compile
-	@echo "start to run..."
-	@qemu-system-riscv32 -nographic -smp 1 -machine virt -bios none -kernel start.elf 
-	@echo "run done"
 
 clean:
 	@echo "start to clean..."
-	@rm -rf start.*
+	@rm -rf *.o *.exe
 	@echo "clean done"
