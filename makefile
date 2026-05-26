@@ -22,5 +22,5 @@ debug: link
 
 clean:
 	@echo "start to clean..."
-	@rm -rf *.o *.exe
+	@rm -rf *.o *.exe *.elf *.bin
 	@echo "clean done"
