@@ -1,15 +1,16 @@
 gcc_flag = -nostdlib -fno-builtin -g -Wall -march=rv32g -mabi=ilp32
 os_elf = os.elf
 
-compile: start.s kernel.c
+compile: start.s kernel.c uart.c
 	@echo "start to compile..."
 	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o start.o start.s
 	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o kernel.o kernel.c 
+	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o uart.o uart.c 
 	@echo "compile done"
 
 link: compile
 	@echo "start to link..."
-	@riscv64-unknown-elf-gcc ${gcc_flag} -Ttext=0x80000000 -o ${os_elf} start.o kernel.o
+	@riscv64-unknown-elf-gcc ${gcc_flag} -Ttext=0x80000000 -o ${os_elf} start.o kernel.o uart.o
 	@echo "link done..."	
 
 
