@@ -20,6 +20,9 @@ debug: link
 	@riscv64-unknown-elf-gdb -q -ex 'target remote localhost:1234' -ex 'b _start' -ex 'b start_kernel' ${os_elf}
 	@echo "debug done"
 
+run: link
+	@echo "start to run..."
+	@qemu-system-riscv32 -nographic -smp 1 -machine virt -bios none -kernel ${os_elf}
 
 clean:
 	@echo "start to clean..."
