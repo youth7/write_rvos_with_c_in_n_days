@@ -10,8 +10,7 @@ compile: start.s kernel.c uart.c
 
 link: compile
 	@echo "start to link..."
-# 	@riscv64-unknown-elf-gcc ${gcc_flag} -Ttext=0x80000000 -o ${os_elf} start.o kernel.o uart.o
-	@riscv64-unknown-elf-gcc ${gcc_flag} -T os.ld -o ${os_elf} start.o kernel.o uart.o
+	@riscv64-unknown-elf-gcc ${gcc_flag} -Ttext=0x80000000 -o ${os_elf} start.o kernel.o uart.o
 	@echo "link done..."	
 
 
