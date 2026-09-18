@@ -7,11 +7,13 @@ compile: start.s kernel.c uart.c
 	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o kernel.o kernel.c 
 	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o uart.o uart.c 
 	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o printf.o printf.c 
+	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o mem.o mem.S
+	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o page.o page.c 
 	@echo "compile done"
 
 link: compile
 	@echo "start to link..."
-	@riscv64-unknown-elf-gcc ${gcc_flag} -Ttext=0x80000000 -o ${os_elf} start.o kernel.o uart.o printf.o
+	@riscv64-unknown-elf-gcc ${gcc_flag} -T os.ld -o ${os_elf} start.o kernel.o uart.o printf.o mem.o page.o
 	@echo "link done..."	
 
 
