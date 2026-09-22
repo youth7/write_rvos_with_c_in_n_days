@@ -17,10 +17,10 @@
 #define SRP 7
 
 // 定义指针的类型
-typedef unsigned char uint8;
+typedef unsigned char uint8_t;
 
 // 定义指针的类型
-#define UART_REG(reg) ((volatile uint8 *)(UART0 + reg))
+#define UART_REG(reg) ((volatile uint8_t *)(UART0 + reg))
 
 // 定义读寄存器的宏
 #define READ_REG(reg) (*(UART_REG(reg)))
@@ -36,7 +36,7 @@ void uart_init(void)
     // 禁用中断控制
     WRITE_REG(IER, 0x00);
 
-    uint8 lcr = READ_REG(LCR);
+    uint8_t lcr = READ_REG(LCR);
     // 设置LCR的DLAB位(第7位)为1，改为配置波特率模式
     WRITE_REG(LCR, lcr | 0b10000000);
 
