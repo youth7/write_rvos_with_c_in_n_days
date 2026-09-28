@@ -41,11 +41,9 @@ static inline uint32_t _align_page(uint32_t address) {
 
 static inline uint32_t ceil(uint32_t number, uint32_t div) { return number % div == 0 ? number / div : number / div + 1; }
 
-static inline uint32_t floor(uint32_t number, uint32_t div) { return number % div == 0 ? number / div : number / div; }
-
 static inline void init_meta() {
   // 初始化meta区，全都置为0
-  for (int i = _heap_start_aligned; i < _alloc_start; i++) {
+  for (uint32_t i = _heap_start_aligned; i < _alloc_start; i++) {
     *(uint8_t *)i = 0;
   }
 }
@@ -73,9 +71,7 @@ static inline uint32_t find_Continuous_mem_block_from_here(uint32_t first_avaiab
 }
 
 static inline void set_flags(struct PageDescriptor *p, uint8_t flags) {
-  //   printf("p=%p flags=%x\n", p, flags);
   p->flags |= flags;
-  //   printf("p=%p flags=%x\n", p, flags);
 }
 
 static inline void set_descriptors_flags(uint32_t start_addr, uint32_t size, uint8_t flags) {
@@ -98,7 +94,7 @@ static inline void mark_used(uint32_t start_addr, uint32_t size) {
 void *page_alloc(int required_page) {
   // 这是一个非常低效的内存分配算法，每次都要扫描meta区，但我们这里只是为了演示，
   printf("start to alloc memory for %d------------------------------------\n", required_page);
-  for (int i = 0; i < _number_of_usable_pages - required_page; i++) {
+  for (int i = 0; i <= _number_of_usable_pages - required_page; i++) {
     //   printf("i=%d _number_of_usable_pages=%d required_page = %d \n", i, _number_of_usable_pages, required_page);
     struct PageDescriptor *p = (struct PageDescriptor *)(_heap_start_aligned + i);
     if (is_used(p)) {
@@ -110,7 +106,7 @@ void *page_alloc(int required_page) {
     uint32_t found = find_Continuous_mem_block_from_here(i, required_page);
     if (found == -1) {
       printf("no available memory for address i=%x\n", i);
-      continue;;
+      continue;
     } else {
       mark_used(found + _heap_start_aligned, required_page);
       uint32_t addr = _alloc_start + found * PAGE_SIZE;
@@ -118,21 +114,22 @@ void *page_alloc(int required_page) {
       return (void *)addr;
     }
   }
+  printf("no available memory at all");
+  return 0;
 }
 
 
 void page_free(void *_addr) {
   uint32_t addr = (uint32_t)_addr;
   // 理论上来说，传入的地址必须是某段内存的首地址我们才能对它进行释放，但这里只是演示因此没有做严谨。
-  if (addr < _alloc_start || addr > _alloc_end) {
+  if (addr < _alloc_start || addr >= _alloc_end) {
     printf("addr=%p is invalid, can not free it\n", addr);
     return;
   }
-  printf("start to free addr %p ~~~~~~~~~~~~~~~~~~~~~~~~\n", addr);
-  uint32_t seq_of_meta = (addr - _alloc_start) / PAGE_SIZE;
-  struct PageDescriptor *p = (struct PageDescriptor *)(_heap_start_aligned + seq_of_meta);
-  printf("seq_of_meta = %d , addr = %p ~~~~~~~~~~~~~~~~~~~~~~~~\n", seq_of_meta, p);
-  int i = 0;
+  printf("start to free addr %p ♻️ ♻️ ♻️ ♻️ \n", addr);
+  uint32_t addrss_of_descriptor = (addr - _alloc_start) / PAGE_SIZE;
+  struct PageDescriptor *p = (struct PageDescriptor *)(_heap_start_aligned + addrss_of_descriptor);
+  printf("addrss_of_descriptor = %d , addr = %p ♻️ ♻️ ♻️ ♻️ \n", addrss_of_descriptor, p);
   while (1) {
     if (is_last(p)) {
       p->flags = 0;
@@ -149,11 +146,13 @@ void page_free(void *_addr) {
 
 
 void page_test(void) {
-  void *p = page_alloc(3);
-  page_alloc(14);
+  page_alloc(3);
+  void *p = page_alloc(14);
   page_alloc(15);
   page_free(p);
   page_alloc(2);
+  page_alloc(3);
+  page_alloc(44);
 }
 
 
@@ -168,18 +167,17 @@ void page_init() {
   printf("==============heap init start===========================\n");
   // 堆按照4096对齐
   _heap_start_aligned = _align_page(HEAP_START);
-  _number_of_meta_pages = floor(HEAP_SIZE - (_heap_start_aligned - HEAP_START), 4096 * 4097);
-  _number_of_usable_pages = _number_of_meta_pages * 4096;
+  _number_of_meta_pages = ceil(HEAP_SIZE - (_heap_start_aligned - HEAP_START), 4096 * 4097);
+  uint32_t total_pages = (HEAP_SIZE - (_heap_start_aligned - HEAP_START)) / PAGE_SIZE;
+  _number_of_usable_pages = total_pages - _number_of_meta_pages;
   _alloc_start = _heap_start_aligned + _number_of_meta_pages * 4096;
   _alloc_end = _alloc_start + _number_of_usable_pages * 4096;
   init_meta();
-  struct PageDescriptor t = {1};
-  printf("size of descripter %d\n", sizeof(t));
   printf("HEAP_START: %x\n", HEAP_START);
   printf("HEAP_SIZE: %x\n", HEAP_SIZE);
   printf("_heap_start_aligned: %p\n", _heap_start_aligned);
-  printf("_number_of_meta_pages: %x\n", _number_of_meta_pages);
-  printf("_number_of_usable_pages: %x\n", _number_of_usable_pages);
+  printf("_number_of_meta_pages: %d\n", _number_of_meta_pages);
+  printf("_number_of_usable_pages: %d\n", _number_of_usable_pages);
   printf("_alloc_start: %x\n", _alloc_start);
   printf("_alloc_end: %x\n", _alloc_end);
   printf("TEXT:   %p -> %p\n", TEXT_START, TEXT_END);
