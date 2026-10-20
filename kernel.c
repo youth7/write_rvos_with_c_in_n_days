@@ -1,7 +1,10 @@
 #include "io.h"
 extern void page_init();
-extern int HEAP_START;
-extern int _heap_start;
+extern void user_task0();
+extern void user_task1();
+extern void (*yield)(void);
+extern void schedule();
+
 
 void start_kernel(void)
 {
@@ -11,5 +14,9 @@ void start_kernel(void)
 	uart_init();
 	uart_puts("hello riscv!!!!!!!!!!!!!!!\n");
 	page_init();
+	printf("*yield=%p  yield=%p &yield=%p  schedule=%p\n", *yield, yield, &yield, schedule);
+	schedule();
+	user_task0();
+	user_task1();
 	while (1) {}; 
 }
