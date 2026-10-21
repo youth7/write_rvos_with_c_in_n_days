@@ -1,7 +1,7 @@
 gcc_flag = -nostdlib -fno-builtin -g -Wall -march=rv32g -mabi=ilp32
 os_elf = os.elf
 
-compile: start.s kernel.c uart.c
+compile: start.s kernel.c uart.c printf.c mem.S page.c user.c schedule.c entry.s
 	@echo "start to compile..."
 	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o start.o start.s
 	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o kernel.o kernel.c 
@@ -10,12 +10,13 @@ compile: start.s kernel.c uart.c
 	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o mem.o mem.S
 	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o page.o page.c 
 	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o user.o user.c 
-	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o schedule.o schedule.c 
+	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o schedule.o schedule.c
+	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o entry.o entry.s
 	@echo "compile done"
 
 link: compile
 	@echo "start to link..."
-	@riscv64-unknown-elf-gcc ${gcc_flag} -T os.ld -o ${os_elf} start.o kernel.o uart.o printf.o mem.o page.o user.o schedule.o
+	@riscv64-unknown-elf-gcc ${gcc_flag} -T os.ld -o ${os_elf} start.o kernel.o uart.o printf.o mem.o page.o user.o schedule.o entry.o
 	@echo "link done..."	
 
 

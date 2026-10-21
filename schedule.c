@@ -52,33 +52,32 @@ struct context contexts[MAX_TASKS] = {0};
 static uint32_t current = -1;
 static uint32_t top = -1;
 
-extern void switch_to(struct context * next);
+extern void switch_to(struct context * context_of_next_task);
 //将一个用户任务加载到任务栈中，并初始化其上下文信息
-void load_user_task(void (*fn)(void)){
-    top++;
-    contexts[top].ra = (uint32_t)fn; // 将任务的地址放置到ra寄存器中
-    contexts[top].sp = task_stacks[top] + 1023;// 设置任务的stack地址，需要注意栈是从高地址往低地址增长
+void load_one_task(void (*fn)(void)){
+  top++;
+  contexts[top].ra = (uint32_t)fn; // 将任务的地址放置到ra寄存器中
+  contexts[top].sp = task_stacks[top] + 1023;// 设置任务的stack地址，需要注意栈是从高地址往低地址增长
+  printf("已经加载任务%d，地址是%p, stack是%p\n", top, contexts[top].ra, contexts[top].sp);
 }
 
-void switch_to(struct context* context_of_next_task){
-    
-}
 
 //实现真正的调度
 void schedule(void){
-    printf("%p schedule = \n", schedule);
-    return;
-    //确定下一个任务并取出它的上下文
-    // current = (current + 1) % MAX_TASKS; 
-    // //将上下文传给switch()，实现运行该任务
-    // struct context* context_of_next_task = &contexts[current];
-    // switch_to(&context_of_next_task);
+    // 确定下一个任务并取出它的上下文
+    current = (current + 1) % MAX_TASKS; 
+    //将上下文传给switch()，实现运行该任务
+    printf("即将调度任务%d\n", current);
+    struct context* context_of_next_task = &contexts[current];
+    switch_to(context_of_next_task);
 }
 
-void (*yield) (void) = schedule;
+
 
 //初始化调度器所需的其他参数，例如mscratch
 void schedule_init(void){
+  uint32_t x = 0;
+  asm volatile("csrw mscratch, %0" : : "r" (x));
 }
 
 
@@ -89,3 +88,4 @@ void sleep(int s) {
 }
 
 
+void (*yield) (void) = schedule;
