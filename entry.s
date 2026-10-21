@@ -40,6 +40,7 @@
 .endm
 
 
+
 .macro resore_reg base
     lw ra, 0(\base)
     lw sp, 4(\base)
@@ -79,6 +80,9 @@
     lw t6, 120(\base)
 .endm
 
+# 注意上述宏展开运行时，全程都需要读取base这个寄存器的值，因此base的值全程不能被修改。
+# 而base寄存器又必须是32个通用寄存器之一，因此base必须取t6，这样才能达到上述效果
+
 
 
 .text
@@ -93,7 +97,8 @@
 # switch_to在C语言中的原型为：void switch_to(struct context *);
 # next任务的地址存在寄存器a0中
 switch_to:
-    # 先判断mscratch的值，因为mscratch无法直接用在分支跳转指令中，因此我们先将它读取到寄存器t6，其实读取到任意寄存器都可以，选t6首先因为它是临时寄存器，同时它位于寄存器列表的最后一个
+    # 先判断mscratch的值，因为mscratch无法直接用在分支跳转指令中，因此我们先将它读取到寄存器t6
+    # 选t6首先因为它是临时寄存器，同时它位于寄存器列表的最后一个，这对resore_reg来说至关重要！
     csrrw t6, mscratch, t6
     beqz t6, resotre_reg
 
@@ -105,13 +110,13 @@ save_all_reg:
     csrr t5, mscratch         # 读取原始t8的值到t5中，准备保存
     sw t5, 120(t6)            # t6的偏移量是120
 
+# 把next task的上下文加载到寄存器中
 resotre_reg:
-    # 把next task的上下文加载到寄存器中
-    csrw mscratch, a0
-    resore_reg a0
     # 设置mscratch为a0，则mscratch指向了next task
+    csrw mscratch, a0
+    mv	t6, a0  #这一步至关重要，不能直接esore_reg a0，否则a0被覆盖之后，后面依赖a0的指令全都出错
+    resore_reg t6
     # ret展开后是：jalr x0, x1, 0，即跳转到x1(ra)寄存器的地址开始运行，并抛弃返回地址的值。
     ret
 
-
-
+.end

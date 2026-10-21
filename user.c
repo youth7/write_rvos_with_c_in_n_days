@@ -7,7 +7,8 @@ void user_task0(void) {
   printf("this is task0 🐨 🐨 🐨 🐨 🐨 addr = %p\n", user_task0);
   while (1) {
     sleep(1);
-    printf("this is task0 🐨 🐨 🐨 🐨 🐨 addr = %p\n", user_task0);
+    printf("this is task0 🐨  addr = %p\n", user_task0);
+    yield();
   }
 }
 
@@ -15,7 +16,8 @@ void user_task1(void) {
   printf("this is task1 😮 😮 😮 😮 😮 addr = %p\n", user_task1);
   while (1) {
     sleep(1);
-    printf("this is task1 😮 😮 😮 😮 😮 addr = %p\n", user_task1);
+    printf("this is task1 😮  addr = %p\n", user_task1);
+    yield();
   }
 }
 

@@ -65,7 +65,7 @@ void load_one_task(void (*fn)(void)){
 //实现真正的调度
 void schedule(void){
     // 确定下一个任务并取出它的上下文
-    current = (current + 1) % MAX_TASKS; 
+    current = (current + 1) % (top+1); 
     //将上下文传给switch()，实现运行该任务
     printf("即将调度任务%d\n", current);
     struct context* context_of_next_task = &contexts[current];
@@ -83,6 +83,7 @@ void schedule_init(void){
 
 void sleep(int s) {
   for (int i = 0; i < s * 400000; i++) {
+    // printf("%d\r",i);
     // 在我的机器上，400000次循环大约为1秒，具体数值可能因机器性能不同而有所差异
   }
 }
