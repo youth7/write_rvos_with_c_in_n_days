@@ -78,6 +78,7 @@
     lw t4, 112(\base) 
     lw t5, 116(\base)
     lw t6, 120(\base)
+    # t6必须作为基寄存器，即最后一个保存的寄存器必定是基寄存器
 .endm
 
 # 注意上述宏展开运行时，全程都需要读取base这个寄存器的值，因此base的值全程不能被修改。
@@ -114,7 +115,7 @@ save_all_reg:
 resotre_reg:
     # 设置mscratch为a0，则mscratch指向了next task
     csrw mscratch, a0
-    mv	t6, a0  #这一步至关重要，不能直接esore_reg a0，否则a0被覆盖之后，后面依赖a0的指令全都出错
+    mv	t6, a0  #这一步至关重要，不能直接resore_reg a0，否则a0被覆盖之后，后面依赖a0的指令全都出错
     resore_reg t6
     # ret展开后是：jalr x0, x1, 0，即跳转到x1(ra)寄存器的地址开始运行，并抛弃返回地址的值。
     ret

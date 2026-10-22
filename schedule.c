@@ -3,7 +3,8 @@
 
 #define MAX_TASKS 10
 #define STACK_SIZE 1024
-
+#define ONE_SECOND 40000000
+// 在我的机器上，ONE_SECOND次循环大约为1秒，具体数值可能因机器性能不同而有所差异
 
 
 
@@ -17,8 +18,8 @@ struct context {
     uint32_t t1; //        ┃t0-t2寄存器是临时寄存器，用于保存函数调用过程中不需要保留的值。
     uint32_t t2; //━━━━━━━━┛
                  
-    uint32_t s0;//━━━━━━━━┓
-    uint32_t s1;//━━━━━━━━┛ s0-s1寄存器是保存(saved)寄存器，用于保存函数调用过程中需要恢复的值。
+    uint32_t s0;//━━━━━━━━━┓
+    uint32_t s1;//━━━━━━━━━┛ s0-s1寄存器是保存(saved)寄存器，用于保存函数调用过程中需要恢复的值。
 
     uint32_t a0; //━━━━━━━━┓
     uint32_t a1; //        ┃
@@ -46,9 +47,11 @@ struct context {
     uint32_t t6; //━━━━━━━━┛
 };
 
+// 用户函数的运行时栈，和start.s中的内核运行时栈不是一回事
 uint8_t task_stacks[MAX_TASKS][STACK_SIZE] = {0};
 struct context contexts[MAX_TASKS] = {0}; 
 
+//top指向任务队列中最后一个任务，current指向第一个任务
 static uint32_t current = -1;
 static uint32_t top = -1;
 
@@ -57,7 +60,7 @@ extern void switch_to(struct context * context_of_next_task);
 void load_one_task(void (*fn)(void)){
   top++;
   contexts[top].ra = (uint32_t)fn; // 将任务的地址放置到ra寄存器中
-  contexts[top].sp = task_stacks[top] + STACK_SIZE -1;// 设置任务的stack地址，需要注意栈是从高地址往低地址增长
+  contexts[top].sp = task_stacks[top] + STACK_SIZE -1;// 设置任务的stack地址，需要注意栈是从高地址往低地址增长，因此需要指向当前栈的底部（+ STACK_SIZE -1）
   printf("已经加载任务%d，地址是%p, stack是%p\n", top, contexts[top].ra, contexts[top].sp);
 }
 
@@ -82,9 +85,8 @@ void schedule_init(void){
 
 
 void sleep(int s) {
-  for (int i = 0; i < s * 400000; i++) {
+  for (int i = 0; i < s * ONE_SECOND; i++) {
     // printf("%d\r",i);
-    // 在我的机器上，400000次循环大约为1秒，具体数值可能因机器性能不同而有所差异
   }
 }
 
