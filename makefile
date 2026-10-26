@@ -4,12 +4,12 @@ os_elf = os.elf
 compile: start.s kernel.c uart.c printf.c mem.S page.c user.c schedule.c entry.s
 	@echo "start to compile..."
 	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o start.o start.s
-	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o kernel.o kernel.c 
-	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o uart.o uart.c 
-	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o printf.o printf.c 
+	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o kernel.o kernel.c
+	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o uart.o uart.c
+	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o printf.o printf.c
 	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o mem.o mem.S
-	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o page.o page.c 
-	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o user.o user.c 
+	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o page.o page.c
+	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o user.o user.c
 	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o schedule.o schedule.c
 	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o entry.o entry.s
 	@echo "compile done"
@@ -17,12 +17,12 @@ compile: start.s kernel.c uart.c printf.c mem.S page.c user.c schedule.c entry.s
 link: compile
 	@echo "start to link..."
 	@riscv64-unknown-elf-gcc ${gcc_flag} -T os.ld -o ${os_elf} start.o kernel.o uart.o printf.o mem.o page.o user.o schedule.o entry.o
-	@echo "link done..."	
+	@echo "link done..."
 
 
 debug: link
 	@echo "start to debug..."
-	@qemu-system-riscv32 -nographic -smp 1 -machine virt -bios none -kernel ${os_elf} -s -S & 
+	@qemu-system-riscv32 -nographic -smp 1 -machine virt -bios none -kernel ${os_elf} -s -S &
 	@riscv64-unknown-elf-gdb -q -ex 'target remote localhost:1234' -ex 'b _start' -ex 'b start_kernel' ${os_elf}
 	@echo "debug done"
 
