@@ -28,6 +28,7 @@ void user_task1(void) {
     printf("即将进入异常\n");
     *(uint32_t *)0 = 0;
     // make_exception();
+    printf("已经从异常中返回了\n");    
     yield();
   }
 }
