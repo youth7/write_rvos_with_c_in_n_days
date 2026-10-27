@@ -16,10 +16,10 @@ void start_kernel(void)
 	uart_puts("hello riscv!!!!!!!!!!!!!!!\n");
 	page_init();
 	trap_init();
-	make_exception();
-	// *(uint32_t *)0 = 0;
+	// make_exception();
 	schedule_init();
 	load_tasks();
+	*(uint32_t *)0 = 0;
 	schedule();
 	while (1) {}; 
 }
