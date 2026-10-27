@@ -34,21 +34,8 @@ void user_task1(void) {
 }
 
 
-void user_task2(void) {
-  printf("task2 start ❤️‍🔥 ❤️‍🔥 ❤️‍🔥 ❤️‍🔥 ❤️‍🔥 addr = %p\n", user_task2);
-  printf("即将进入异常\n");
-  *(uint32_t *)0 = 0;
-  // make_exception();
-  printf("已经从异常中返回了\n");
-
-
-  
-}
-
-
 void load_tasks(void) {
   printf("加载的任务地址是user_task0=%p user_task1=%p\n", user_task0, user_task1);
   load_one_task(&user_task0);
   load_one_task(&user_task1);
-  // load_one_task(&user_task2);
 }
