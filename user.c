@@ -6,21 +6,23 @@
 extern void sleep(int s);
 
 void user_task0(void) {
-  printf("task0 start 🐨 🐨 🐨 🐨 🐨 addr = %p\n", user_task0);
+  int i = 0;
+  printf("task%d start 🐨 🐨 🐨 🐨 🐨 addr = %p\n", i, user_task0);
   sleep(WAIT_FOR_SECONDS);
   while (1) {
     sleep(SLEEP_INTERVAL);
-    printf("task0 in while loop 🐨\n");
+    printf("task%d in while loop 🐨\n", i);
     yield();
   }
 }
 
 void user_task1(void) {
-  printf("task0 start 😮 😮 😮 😮 😮 addr = %p\n", user_task1);
+  int i = 1;
+  printf("task%d start 😮 😮 😮 😮 😮 addr = %p\n", i, user_task0);
   sleep(WAIT_FOR_SECONDS);
   while (1) {
     sleep(SLEEP_INTERVAL);
-    printf("task0 in while loop 😮\n");
+    printf("task%d in while loop 😮\n", i);
     yield();
   }
 }
