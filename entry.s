@@ -119,3 +119,39 @@ do_restore_reg:
     restore_reg t6
     # ret展开后是：jalr x0, x1, 0，即跳转到x1(ra)寄存器的地址开始运行，并抛弃返回地址的值。
     ret
+
+
+
+
+.global trap_vector
+# 函数地址按照4对齐，说明是direct模式
+.align 4
+trap_vector:
+    # 保存当前函数的上下文到mscratch指向的地方
+    # 从scheudle.c可知，每个函数的上下文都存在contexts的某个位置中，而mscratch指向了这个地方
+    csrrw t6, mscratch, t6
+    save_reg t6
+    # 和switch_to一样，手动保存t6的值
+    csrr t5, mscratch         
+    sw t5, 120(t6)
+ 
+    # 恢复mscratch的值
+    csrw mscratch, t6
+
+    # 调用中断/异常处理函数
+    csrr a0, mepc
+    csrr a1, mcause
+
+    # trap_handler是用c编写的异常处理函数
+    call trap_handler
+
+    csrw	mepc, a0
+
+    # 恢复寄存器，注意mscratch在trap_handler中没有被改变过（这是相互配合的结果）
+    # 如果mscratch在trap_handler中被改变了，那么我们就必须提前将它存入到callee save的寄存器中，以便后面可以继续使用    
+    csrr t6, mscratch
+    restore_reg t6
+
+    #返回原来的执行流
+    mret
+.end

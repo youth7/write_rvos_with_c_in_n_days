@@ -12,11 +12,12 @@ compile: start.s kernel.c uart.c printf.c mem.S page.c user.c schedule.c entry.s
 	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o user.o user.c
 	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o schedule.o schedule.c
 	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o entry.o entry.s
+	@riscv64-unknown-elf-gcc  ${gcc_flag} -c -o trap.o trap.c
 	@echo "compile done"
 
 link: compile
 	@echo "start to link..."
-	@riscv64-unknown-elf-gcc ${gcc_flag} -T os.ld -o ${os_elf} start.o kernel.o uart.o printf.o mem.o page.o user.o schedule.o entry.o
+	@riscv64-unknown-elf-gcc ${gcc_flag} -T os.ld -o ${os_elf} start.o kernel.o uart.o printf.o mem.o page.o user.o schedule.o entry.o trap.o
 	@echo "link done..."
 
 

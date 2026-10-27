@@ -60,7 +60,7 @@ extern void switch_to(struct context * context_of_next_task);
 void load_one_task(void (*fn)(void)){
   top++;
   contexts[top].ra = (uint32_t)fn; // 将任务的地址放置到ra寄存器中
-  contexts[top].sp = task_stacks[top] + STACK_SIZE -1;// 设置任务的stack地址，需要注意栈是从高地址往低地址增长，因此需要指向当前栈的底部（+ STACK_SIZE -1）
+  contexts[top].sp = (uint32_t)task_stacks[top] + STACK_SIZE -1;// 设置任务的stack地址，需要注意栈是从高地址往低地址增长，因此需要指向当前栈的底部（+ STACK_SIZE -1）
   printf("已经加载任务%d，地址是%p, stack是%p\n", top, contexts[top].ra, contexts[top].sp);
 }
 

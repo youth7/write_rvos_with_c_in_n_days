@@ -133,7 +133,7 @@ int printf(const char* s, ...)
 
 void panic(char *s)
 {
-	printf("panic: ");
+	printf("panic: ⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡");
 	printf(s);
 	printf("\n");
 	while(1){};
