@@ -4,8 +4,10 @@
 
 extern void trap_vector(void);
 
-void trap_handler(uint32_t mcause, uint32_t mepc) {
+uint32_t trap_handler(uint32_t mepc, uint32_t mcause) {
   printf("🪤🪤🪤🪤🪤🪤🪤🪤🪤🪤🪤%x %p\n", mcause, mepc);
+  return mepc + 4;
+//   return mepc;
 }
 
 void trap_init(void) { r_mtvec((uint32_t)trap_vector); }

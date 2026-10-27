@@ -19,7 +19,7 @@ void start_kernel(void)
 	// make_exception();
 	schedule_init();
 	load_tasks();
-	*(uint32_t *)0 = 0;
+	
 	schedule();
 	while (1) {}; 
 }

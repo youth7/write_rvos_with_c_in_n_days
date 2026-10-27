@@ -28,7 +28,6 @@ void user_task1(void) {
     printf("即将进入异常\n");
     *(uint32_t *)0 = 0;
     // make_exception();
-    printf("已经从异常中返回了\n");    
     yield();
   }
 }
@@ -37,9 +36,12 @@ void user_task1(void) {
 void user_task2(void) {
   printf("task2 start ❤️‍🔥 ❤️‍🔥 ❤️‍🔥 ❤️‍🔥 ❤️‍🔥 addr = %p\n", user_task2);
   printf("即将进入异常\n");
-  // *(uint32_t *)0 = 0;
+  *(uint32_t *)0 = 0;
   // make_exception();
   printf("已经从异常中返回了\n");
+
+
+  
 }
 
 
